@@ -1,229 +1,172 @@
 <!DOCTYPE html>
-<html lang="vi" class="scroll-smooth">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DMP AI Dev - Vibe Coding & AI Solutions</title>
-    <meta name="description" content="Chuyên phát triển ứng dụng AI, đào tạo Vibe Coding và thiết kế website tích hợp trí tuệ nhân tạo.">
+    <title>DMP AI Dev - Tương lai của Vibe Coding</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#6366f1',
-                        secondary: '#a855f7',
-                        dark: '#0f172a',
-                        surface: '#1e293b'
-                    }
-                }
-            }
-        }
-    </script>
-<style>:root {
-  --primary: #2563eb;
-  --radius: 0.75rem;
-}</style></head>
-<body class="bg-dark text-white font-sans antialiased selection:bg-primary selection:text-white">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/v.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .ant-btn { transition: all 0.3s ease; }
+        .ant-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(24, 144, 255, 0.4); }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3); }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800" x-data="publicApp()" x-init="init()">
 
-    <!-- Navigation -->
-    <nav class="fixed w-full z-50 bg-dark/90 backdrop-blur-md border-b border-white/10">
+    <!-- Navbar -->
+    <nav class="fixed w-full z-50 glass shadow-sm">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary" id="nav-logo">DMP AI Dev</a>
-            <div class="hidden md:flex space-x-6 text-sm font-medium">
-                <a href="#home" class="hover:text-primary transition">Trang chủ</a>
-                <a href="#about" class="hover:text-primary transition">Về chúng tôi</a>
-                <a href="#services" class="hover:text-primary transition">Dịch vụ</a>
-                <a href="#products" class="hover:text-primary transition">Sản phẩm</a>
-                <a href="#pricing" class="hover:text-primary transition">Bảng giá</a>
-                <a href="#blog" class="hover:text-primary transition">Blog</a>
-                <a href="#contact" class="hover:text-primary transition">Liên hệ</a>
+            <div class="flex items-center gap-3">
+                <template x-if="config.brand.logo">
+                    <img :src="config.brand.logo" class="h-10 w-10 object-contain rounded-lg">
+                </template>
+                <span class="text-2xl font-bold text-blue-600" x-text="config.brand.name"></span>
             </div>
-            <button class="md:hidden text-white"><i class="fas fa-bars"></i></button>
+            <div class="hidden md:flex space-x-8 font-medium text-slate-600">
+                <a href="#services" class="hover:text-blue-500 transition">Dịch vụ</a>
+                <a href="#courses" class="hover:text-blue-500 transition">Đào tạo</a>
+                <a href="#portfolio" class="hover:text-blue-500 transition">Dự án</a>
+                <a href="#contact" class="text-blue-600">Liên hệ</a>
+            </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center justify-center pt-20 relative overflow-hidden">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/10 z-0"></div>
-        <div class="container mx-auto px-6 relative z-10 text-center">
-            <span class="inline-block py-1 px-3 rounded-full bg-white/10 border border-white/20 text-sm mb-6 animate-fade-in">Kỷ nguyên AI Coding</span>
-            <h1 id="hero-title" class="text-5xl md:text-7xl font-bold mb-6 leading-tight">Phát triển ứng dụng AI với <br><span class="text-primary">Vibe Coding</span></h1>
-            <p id="hero-desc" class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">Tăng tốc độ lập trình gấp 10 lần. Chúng tôi chuyên xây dựng giải pháp AI, đào tạo lập trình viên thế hệ mới và thiết kế website thông minh.</p>
-            <div class="flex justify-center gap-4">
-                <a href="#services" class="bg-primary hover:bg-primary/80 text-white px-8 py-3 rounded-lg font-semibold transition">Khám phá ngay</a>
-                <a href="#contact" class="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-3 rounded-lg font-semibold transition">Tư vấn miễn phí</a>
+    <header class="relative pt-32 pb-20 lg:pt-48 overflow-hidden">
+        <div class="container mx-auto px-6 relative z-10 grid lg:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-100 text-blue-600 text-sm font-semibold mb-4">Dẫn đầu xu hướng AI</span>
+                <h1 class="text-5xl lg:text-6xl font-bold leading-tight mb-6 text-slate-900" x-text="config.hero.title"></h1>
+                <p class="text-xl text-slate-600 mb-8 leading-relaxed" x-text="config.hero.subtitle"></p>
+                <div class="flex gap-4">
+                    <a href="#contact" class="ant-btn bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold">Tư vấn ngay</a>
+                    <a href="#courses" class="ant-btn bg-white border border-slate-200 text-slate-700 px-8 py-3 rounded-lg font-semibold hover:border-blue-500 hover:text-blue-500">Xem khóa học</a>
+                </div>
             </div>
-            <div class="mt-16">
-                <img id="hero-img" src="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1200" alt="AI Dashboard" class="rounded-xl shadow-2xl border border-white/10 mx-auto w-full max-w-4xl">
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-surface">
-        <div class="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
-            <div>
-                <img id="about-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800" class="rounded-xl shadow-lg" alt="Team">
-            </div>
-            <div>
-                <h2 class="text-3xl font-bold mb-6 text-primary">Về DMP AI Dev</h2>
-                <h3 id="about-title" class="text-4xl font-bold mb-6">Định hình tương lai công nghệ</h3>
-                <p id="about-desc" class="text-gray-400 mb-6">DMP AI Dev được thành lập với sứ mệnh phổ cập Vibe Coding - phong cách lập trình dựa trên sự cộng tác sâu sắc giữa con người và AI. Chúng tôi không chỉ viết mã, chúng tôi kiến tạo giải pháp.</p>
-                <ul class="space-y-4 text-gray-300">
-                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-primary"></i> Chuyên gia AI hàng đầu</li>
-                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-primary"></i> Quy trình Vibe Coding tối ưu</li>
-                    <li class="flex items-center gap-3"><i class="fas fa-check-circle text-primary"></i> Cam kết chất lượng 100%</li>
-                </ul>
+            <div class="relative" data-aos="fade-left">
+                <div class="absolute inset-0 bg-blue-500 rounded-full opacity-10 blur-3xl"></div>
+                <template x-if="config.hero.image">
+                     <img :src="config.hero.image" class="relative z-10 w-full rounded-2xl shadow-2xl transform rotate-2 hover:rotate-0 transition duration-500">
+                </template>
+                <template x-if="!config.hero.image">
+                    <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80" class="relative z-10 w-full rounded-2xl shadow-2xl">
+                </template>
             </div>
         </div>
-    </section>
+    </header>
 
-    <!-- Services Section -->
-    <section id="services" class="py-20 bg-dark">
+    <!-- Services -->
+    <section id="services" class="py-20 bg-white">
         <div class="container mx-auto px-6">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Dịch vụ của chúng tôi</h2>
-                <p class="text-gray-400">Giải pháp toàn diện từ đào tạo đến triển khai sản phẩm thực tế.</p>
+            <div class="text-center max-w-2xl mx-auto mb-16" data-aos="fade-up">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Giải pháp Công nghệ & AI</h2>
+                <p class="text-slate-600">Chúng tôi biến ý tưởng thành hiện thực với tốc độ của Vibe Coding.</p>
             </div>
-            <div class="grid md:grid-cols-3 gap-8" id="services-grid">
-                <!-- Services rendered by JS -->
+            <div class="grid md:grid-cols-3 gap-8">
+                <template x-for="service in config.services" :key="service.title">
+                    <div class="p-8 rounded-2xl border border-slate-100 bg-slate-50 hover:shadow-xl transition group" data-aos="fade-up">
+                        <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 mb-6 group-hover:bg-blue-600 group-hover:text-white transition">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3" x-text="service.title"></h3>
+                        <p class="text-slate-600" x-text="service.desc"></p>
+                    </div>
+                </template>
             </div>
         </div>
     </section>
 
-    <!-- Products Section -->
-    <section id="products" class="py-20 bg-surface">
+    <!-- Courses -->
+    <section id="courses" class="py-20 bg-slate-900 text-white">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-12 text-center">Sản phẩm nổi bật</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6" id="products-grid">
-                <!-- Products rendered by JS -->
+            <div class="flex justify-between items-end mb-12">
+                <div data-aos="fade-right">
+                    <h2 class="text-3xl font-bold mb-2">Đào tạo Vibe Coding</h2>
+                    <p class="text-slate-400">Làm chủ AI để lập trình nhanh hơn gấp 10 lần.</p>
+                </div>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <template x-for="course in config.courses" :key="course.title">
+                    <div class="bg-slate-800 rounded-2xl overflow-hidden hover:transform hover:-translate-y-2 transition duration-300" data-aos="zoom-in">
+                         <div class="h-48 bg-slate-700 overflow-hidden">
+                            <template x-if="course.image">
+                                <img :src="course.image" class="w-full h-full object-cover">
+                            </template>
+                            <template x-if="!course.image">
+                                <div class="w-full h-full flex items-center justify-center bg-slate-700 text-slate-500">No Image</div>
+                            </template>
+                         </div>
+                         <div class="p-6">
+                             <div class="flex justify-between items-center mb-4">
+                                 <span class="text-green-400 font-semibold" x-text="course.price"></span>
+                             </div>
+                             <h3 class="text-xl font-bold mb-2" x-text="course.title"></h3>
+                             <p class="text-slate-400 text-sm mb-6" x-text="course.desc"></p>
+                             <button class="w-full py-3 bg-blue-600 rounded-lg font-semibold hover:bg-blue-500 transition">Đăng ký ngay</button>
+                         </div>
+                    </div>
+                </template>
             </div>
         </div>
     </section>
 
-    <!-- Portfolio Section -->
-    <section id="portfolio" class="py-20 bg-dark">
+    <!-- Contact -->
+    <section id="contact" class="py-20 bg-blue-50">
         <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-4 text-center">Dự án đã thực hiện</h2>
-            <p class="text-center text-gray-400 mb-12">Những dấu ấn công nghệ chúng tôi đã tạo ra.</p>
-            <div class="grid md:grid-cols-3 gap-6" id="portfolio-grid">
-                <!-- Portfolio rendered by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Team Section -->
-    <section id="team" class="py-20 bg-surface">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-12 text-center">Đội ngũ chuyên gia</h2>
-            <div class="grid md:grid-cols-4 gap-6" id="team-grid">
-                <!-- Team rendered by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-20 bg-dark relative">
-        <div class="container mx-auto px-6 relative z-10">
-            <h2 class="text-3xl font-bold mb-12 text-center">Bảng giá dịch vụ</h2>
-            <div class="grid md:grid-cols-3 gap-8" id="pricing-grid">
-                <!-- Pricing rendered by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section id="testimonials" class="py-20 bg-gradient-to-b from-surface to-dark">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-12 text-center">Khách hàng nói gì?</h2>
-            <div class="grid md:grid-cols-3 gap-8" id="testimonials-grid">
-                <!-- Testimonials rendered by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section id="faq" class="py-20 bg-surface">
-        <div class="container mx-auto px-6 max-w-4xl">
-            <h2 class="text-3xl font-bold mb-12 text-center">Câu hỏi thường gặp</h2>
-            <div class="space-y-4" id="faq-list">
-                <!-- FAQs rendered by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Blog Section -->
-    <section id="blog" class="py-20 bg-dark">
-        <div class="container mx-auto px-6">
-            <h2 class="text-3xl font-bold mb-12 text-center">Tin tức & Vibe Coding</h2>
-            <div class="grid md:grid-cols-3 gap-8" id="blog-grid">
-                <!-- Blog rendered by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 bg-surface relative">
-        <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-2 gap-12">
-                <div>
+            <div class="bg-white rounded-3xl shadow-xl overflow-hidden grid md:grid-cols-2">
+                <div class="p-12 bg-blue-600 text-white flex flex-col justify-center">
                     <h2 class="text-3xl font-bold mb-6">Liên hệ hợp tác</h2>
-                    <p class="text-gray-400 mb-8">Hãy để lại thông tin, đội ngũ DMP AI Dev sẽ liên hệ với bạn trong vòng 24h.</p>
+                    <p class="mb-8 text-blue-100">Hãy để lại thông tin, chúng tôi sẽ liên hệ lại trong vòng 24h để tư vấn giải pháp tốt nhất cho bạn.</p>
                     <div class="space-y-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center text-primary"><i class="fas fa-map-marker-alt"></i></div>
-                            <div>
-                                <p class="text-sm text-gray-400">Địa chỉ</p>
-                                <p class="font-medium">Hà Nội, Việt Nam</p>
-                            </div>
+                            <span>📍</span> <span x-text="config.brand.address"></span>
                         </div>
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-primary/20 rounded-lg flex items-center justify-center text-primary"><i class="fas fa-envelope"></i></div>
-                            <div>
-                                <p class="text-sm text-gray-400">Email</p>
-                                <p class="font-medium">contact@dmpaidev.vn</p>
-                            </div>
+                            <span>📞</span> <span x-text="config.brand.phone"></span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span>✉️</span> <span x-text="config.brand.email"></span>
                         </div>
                     </div>
                 </div>
-                <form id="contact-form" class="bg-dark p-8 rounded-xl border border-white/5 shadow-xl">
-                    <div class="grid gap-6">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Họ tên</label>
-                            <input type="text" name="name" required class="w-full bg-surface border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition">
+                <div class="p-12">
+                    <form @submit.prevent="submitForm">
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Họ và tên</label>
+                            <input type="text" x-model="lead.name" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Email</label>
-                            <input type="email" name="email" required class="w-full bg-surface border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition">
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Email</label>
+                            <input type="email" x-model="lead.email" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition">
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">Tin nhắn</label>
-                            <textarea name="message" rows="4" required class="w-full bg-surface border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition"></textarea>
+                         <div class="mb-6">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Số điện thoại</label>
+                            <input type="tel" x-model="lead.phone" required class="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition">
                         </div>
-                        <button type="submit" class="w-full bg-primary hover:bg-secondary text-white py-3 rounded-lg font-bold transition">Gửi tin nhắn</button>
-                    </div>
-                </form>
+                        <button type="submit" class="w-full bg-slate-900 text-white py-3 rounded-lg font-bold hover:bg-slate-800 transition">
+                            Gửi thông tin
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-dark border-t border-white/10 py-12">
+    <footer class="bg-slate-900 text-slate-400 py-12">
         <div class="container mx-auto px-6 text-center">
-            <h3 class="text-2xl font-bold mb-4">DMP AI Dev</h3>
-            <p class="text-gray-500 mb-8">Tiên phong trong lĩnh vực Vibe Coding và AI Development tại Việt Nam.</p>
-            <div class="flex justify-center gap-6 mb-8">
-                <a href="#" class="text-gray-400 hover:text-primary transition"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="text-gray-400 hover:text-primary transition"><i class="fab fa-twitter"></i></a>
-                <a href="#" class="text-gray-400 hover:text-primary transition"><i class="fab fa-linkedin-in"></i></a>
-            </div>
-            <p class="text-gray-600 text-sm">© 2023 DMP AI Dev. All rights reserved.</p>
+            <p>© 2024 <span x-text="config.brand.name"></span>. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="js/main.js"></script>
+    <script>
+        AOS.init({ once: true, duration: 800 });
+    </script>
 </body>
 </html>

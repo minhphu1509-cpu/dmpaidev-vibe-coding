@@ -3,131 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DMP AI Admin Dashboard</title>
+    <title>Admin CMS - DMP AI Dev</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#6366f1',
-                        surface: '#f3f4f6'
-                    }
-                }
-            }
-        }
-    </script>
-<style>:root {
-  --primary: #2563eb;
-  --radius: 0.75rem;
-}</style></head>
-<body class="bg-surface text-gray-800 font-sans">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="js/v.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style> body { font-family: 'Inter', sans-serif; } </style>
+</head>
+<body class="bg-slate-100" x-data="adminApp()" x-init="init()">
 
-    <!-- Login Modal -->
-    <div id="login-modal" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
-            <h2 class="text-2xl font-bold mb-6 text-center text-primary">Admin Login</h2>
-            <form id="login-form" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Mật khẩu</label>
-                    <input type="password" id="password" class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Nhập mật khẩu...">
-                    <p id="login-error" class="text-red-500 text-sm mt-2 hidden">Mật khẩu không đúng!</p>
-                </div>
-                <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-bold hover:bg-primary/90 transition">Đăng nhập</button>
-            </form>
+    <!-- Auth Gate -->
+    <div x-show="!isLoggedIn" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-center mb-6 text-slate-800">Hệ Thống Quản Trị</h2>
+            <input type="password" x-model="loginPass" placeholder="Nhập mật khẩu quản trị" class="w-full px-4 py-3 border border-slate-300 rounded-lg mb-4 focus:outline-none focus:border-blue-500">
+            <button @click="login()" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">Đăng Nhập</button>
+            <p x-show="loginError" class="text-red-500 text-center mt-4 text-sm">Mật khẩu không đúng!</p>
         </div>
     </div>
 
-    <!-- Dashboard Interface -->
-    <div id="dashboard" class="hidden min-h-screen flex">
+    <!-- Admin Layout -->
+    <div x-show="isLoggedIn" class="flex h-screen overflow-hidden">
+        
         <!-- Sidebar -->
-        <aside class="w-64 bg-white border-r shadow-sm fixed h-full overflow-y-auto">
-            <div class="p-6 border-b">
-                <h1 class="text-xl font-bold text-primary">DMP Admin</h1>
+        <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shadow-xl">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold text-white">DMP Admin</h1>
+                <p class="text-xs text-slate-500 mt-1">CMS V1.0</p>
             </div>
-            <nav class="p-4 space-y-2">
-                <button onclick="showTab('content')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-surface text-gray-600 font-medium flex items-center gap-3 tab-btn bg-surface text-primary" data-tab="content">
-                    <i class="fas fa-edit"></i> Quản lý Nội dung
+            <nav class="flex-1 px-4 space-y-2">
+                <button @click="tab = 'dashboard'" :class="{'bg-blue-600 text-white': tab==='dashboard'}" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center gap-3">
+                    <span>📊</span> Dashboard
                 </button>
-                <button onclick="showTab('leads')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-surface text-gray-600 font-medium flex items-center gap-3 tab-btn" data-tab="leads">
-                    <i class="fas fa-envelope"></i> Danh sách Lead
+                <button @click="tab = 'content'" :class="{'bg-blue-600 text-white': tab==='content'}" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center gap-3">
+                    <span>✏️</span> Nội dung
                 </button>
-                <button onclick="showTab('media')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-surface text-gray-600 font-medium flex items-center gap-3 tab-btn" data-tab="media">
-                    <i class="fas fa-images"></i> Kho ảnh
+                <button @click="tab = 'leads'" :class="{'bg-blue-600 text-white': tab==='leads'}" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center gap-3">
+                    <span>📬</span> Khách hàng <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full" x-text="leads.length"></span>
                 </button>
-                <button onclick="logout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-red-50 text-red-500 font-medium flex items-center gap-3 mt-8">
-                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                <button @click="tab = 'settings'" :class="{'bg-blue-600 text-white': tab==='settings'}" class="w-full text-left px-4 py-3 rounded-lg hover:bg-slate-800 transition flex items-center gap-3">
+                    <span>⚙️</span> Cài đặt
                 </button>
             </nav>
+            <div class="p-4">
+                <button @click="logout" class="w-full px-4 py-2 text-sm text-slate-400 hover:text-white">Đăng xuất</button>
+            </div>
         </aside>
 
         <!-- Main Content -->
-        <main class="ml-64 flex-1 p-8">
-            <!-- Content Editor Tab -->
-            <div id="tab-content" class="space-y-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">Chỉnh sửa Website</h2>
-                    <button onclick="saveConfig()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition">
-                        <i class="fas fa-save mr-2"></i> Lưu thay đổi
-                    </button>
+        <main class="flex-1 overflow-y-auto p-8">
+            
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-bold text-slate-800 capitalize" x-text="tab"></h2>
+                <button @click="saveConfig" class="bg-green-600 text-white px-6 py-2 rounded-lg font-bold shadow-lg hover:bg-green-700 transition flex items-center gap-2">
+                    <span>💾</span> Lưu thay đổi
+                </button>
+            </div>
+
+            <!-- TAB: Dashboard -->
+            <div x-show="tab === 'dashboard'" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-slate-500 text-sm font-medium">Tổng Leads</h3>
+                    <p class="text-4xl font-bold text-slate-800 mt-2" x-text="leads.length"></p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-slate-500 text-sm font-medium">Dịch vụ Active</h3>
+                    <p class="text-4xl font-bold text-blue-600 mt-2" x-text="config.services.length"></p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <h3 class="text-slate-500 text-sm font-medium">Khóa học</h3>
+                    <p class="text-4xl font-bold text-green-600 mt-2" x-text="config.courses.length"></p>
+                </div>
+            </div>
+
+            <!-- TAB: Content -->
+            <div x-show="tab === 'content'" class="space-y-8">
+                
+                <!-- Section: Brand & Hero -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm">
+                    <h3 class="text-lg font-bold mb-4 border-b pb-2">Thông tin chung & Hero</h3>
+                    <div class="grid gap-4">
+                        <div>
+                            <label class="text-sm text-slate-600">Tiêu đề Hero</label>
+                            <input type="text" x-model="config.hero.title" class="w-full border p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="text-sm text-slate-600">Mô tả Hero</label>
+                            <textarea x-model="config.hero.subtitle" class="w-full border p-2 rounded"></textarea>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                             <div>
+                                <label class="text-sm text-slate-600 block mb-1">Logo (Upload ảnh)</label>
+                                <input type="file" @change="handleImageUpload($event, 'brand.logo')" class="text-sm">
+                                <img :src="config.brand.logo" class="h-12 mt-2 object-contain bg-slate-100 rounded">
+                             </div>
+                             <div>
+                                <label class="text-sm text-slate-600 block mb-1">Hero Image (Upload ảnh)</label>
+                                <input type="file" @change="handleImageUpload($event, 'hero.image')" class="text-sm">
+                                <img :src="config.hero.image" class="h-12 mt-2 object-cover rounded">
+                             </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section: Services -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="text-lg font-bold">Dịch vụ</h3>
+                        <button @click="addItem('services')" class="text-blue-600 text-sm font-bold">+ Thêm mới</button>
+                    </div>
+                    <div class="space-y-4">
+                        <template x-for="(svc, index) in config.services" :key="index">
+                            <div class="flex gap-4 items-start bg-slate-50 p-4 rounded">
+                                <div class="flex-1 grid gap-2">
+                                    <input type="text" x-model="svc.title" placeholder="Tên dịch vụ" class="w-full border p-2 rounded">
+                                    <textarea x-model="svc.desc" placeholder="Mô tả ngắn" class="w-full border p-2 rounded"></textarea>
+                                </div>
+                                <button @click="removeItem('services', index)" class="text-red-500 hover:text-red-700">🗑️</button>
+                            </div>
+                        </template>
+                    </div>
                 </div>
                 
-                <div class="bg-white rounded-xl shadow-sm border p-6">
-                   <div class="flex space-x-4 mb-6 overflow-x-auto pb-2 border-b">
-                       <button onclick="filterSection('hero')" class="px-4 py-2 rounded-full bg-primary text-white text-sm">Hero</button>
-                       <button onclick="filterSection('about')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">About</button>
-                       <button onclick="filterSection('services')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Services</button>
-                       <button onclick="filterSection('products')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Products</button>
-                       <button onclick="filterSection('pricing')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Pricing</button>
-                       <button onclick="filterSection('team')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Team</button>
-                       <button onclick="filterSection('testimonials')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Testimonials</button>
-                       <button onclick="filterSection('faq')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">FAQ</button>
-                       <button onclick="filterSection('blog')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Blog</button>
-                   </div>
-                   
-                   <div id="editor-container" class="space-y-6">
-                       <!-- Form inputs generated by JS -->
-                   </div>
+                <!-- Section: Courses -->
+                <div class="bg-white p-6 rounded-2xl shadow-sm">
+                    <div class="flex justify-between items-center mb-4 border-b pb-2">
+                        <h3 class="text-lg font-bold">Khóa học</h3>
+                        <button @click="addItem('courses')" class="text-blue-600 text-sm font-bold">+ Thêm mới</button>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <template x-for="(course, index) in config.courses" :key="index">
+                            <div class="bg-slate-50 p-4 rounded relative">
+                                <button @click="removeItem('courses', index)" class="absolute top-2 right-2 text-red-500">✖</button>
+                                <div class="grid gap-2">
+                                    <input type="text" x-model="course.title" placeholder="Tên khóa học" class="w-full border p-2 rounded">
+                                    <input type="text" x-model="course.price" placeholder="Giá (VND)" class="w-full border p-2 rounded">
+                                    <textarea x-model="course.desc" placeholder="Mô tả" class="w-full border p-2 rounded"></textarea>
+                                    <div>
+                                        <label class="text-xs text-slate-500">Ảnh bìa</label>
+                                        <input type="file" @change="handleListItemImage($event, 'courses', index)" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
+                                        <img :src="course.image" class="h-16 w-full object-cover mt-2 rounded" x-show="course.image">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Leads Tab -->
-            <div id="tab-leads" class="hidden">
-                <h2 class="text-2xl font-bold mb-6">Danh sách khách hàng tiềm năng</h2>
-                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-                    <table class="w-full text-left">
-                        <thead class="bg-gray-50 border-b">
+            <!-- TAB: Leads -->
+            <div x-show="tab === 'leads'" class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <table class="min-w-full leading-normal">
+                    <thead>
+                        <tr>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ngày</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tên</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email / SĐT</th>
+                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template x-for="(lead, index) in leads" :key="index">
                             <tr>
-                                <th class="p-4 font-semibold text-gray-600">Ngày</th>
-                                <th class="p-4 font-semibold text-gray-600">Tên</th>
-                                <th class="p-4 font-semibold text-gray-600">Email</th>
-                                <th class="p-4 font-semibold text-gray-600">Tin nhắn</th>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <p class="text-gray-900 whitespace-no-wrap" x-text="new Date(lead.date).toLocaleDateString()"></p>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <p class="text-gray-900 whitespace-no-wrap font-bold" x-text="lead.name"></p>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <p class="text-gray-900 whitespace-no-wrap" x-text="lead.email"></p>
+                                    <p class="text-gray-500 whitespace-no-wrap text-xs" x-text="lead.phone"></p>
+                                </td>
+                                <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                                    <button @click="deleteLead(index)" class="text-red-600 hover:text-red-900">Xóa</button>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody id="leads-table-body">
-                            <!-- Leads Data -->
-                        </tbody>
-                    </table>
+                        </template>
+                    </tbody>
+                </table>
+                <div x-show="leads.length === 0" class="p-6 text-center text-gray-500">Chưa có dữ liệu nào.</div>
+            </div>
+
+            <!-- TAB: Settings -->
+            <div x-show="tab === 'settings'" class="bg-white p-6 rounded-2xl shadow-sm">
+                <h3 class="text-lg font-bold mb-4">Cấu hình hệ thống</h3>
+                <div class="mb-6">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">Đổi mật khẩu Admin</label>
+                    <input type="text" x-model="config.password" class="w-full md:w-1/2 px-4 py-3 rounded-lg border border-slate-200">
+                </div>
+                <div class="border-t pt-6">
+                    <button @click="resetDatabase" class="bg-red-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-red-600">Reset Toàn bộ Dữ liệu về Mặc định</button>
                 </div>
             </div>
 
-            <!-- Media Tab -->
-             <div id="tab-media" class="hidden">
-                 <h2 class="text-2xl font-bold mb-6">Kho Hình Ảnh (URLs)</h2>
-                 <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
-                     <p class="text-gray-500 mb-4">Copy các link ảnh từ Unsplash hoặc host khác để dùng trong phần Content.</p>
-                     <div class="grid grid-cols-2 gap-4 text-sm">
-                         <div class="p-2 border rounded bg-gray-50">Tech 1: https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800</div>
-                         <div class="p-2 border rounded bg-gray-50">Tech 2: https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800</div>
-                         <div class="p-2 border rounded bg-gray-50">Code: https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800</div>
-                         <div class="p-2 border rounded bg-gray-50">Team: https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800</div>
-                     </div>
-                 </div>
-             </div>
         </main>
     </div>
-
-    <script src="js/admin.js"></script>
 </body>
 </html>
