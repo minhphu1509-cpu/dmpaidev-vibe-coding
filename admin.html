@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DMP AI Dev</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1677ff;
+            --radius: 6px;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Login Overlay -->
+    <div id="loginOverlay" class="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-96 text-center">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800">DMP Admin Login</h2>
+            <input type="password" id="adminPass" placeholder="Mật khẩu quản trị" class="w-full p-3 border border-gray-300 rounded mb-4 focus:ring-2 focus:ring-blue-500 outline-none">
+            <button onclick="app.adminLogin()" class="w-full bg-[var(--primary)] text-white py-3 rounded hover:bg-blue-600 transition">Đăng nhập</button>
+            <p id="loginMsg" class="text-red-500 text-sm mt-3 hidden">Mật khẩu không đúng!</p>
+        </div>
+    </div>
+
+    <!-- Main Admin Content -->
+    <div id="adminContent" class="hidden">
+        <nav class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="font-bold text-xl text-[var(--primary)]">DMP CMS</div>
+                <button onclick="app.logout()" class="text-gray-500 hover:text-red-500 text-sm"><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+            </div>
+        </nav>
+
+        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+            <!-- Sidebar -->
+            <div class="col-span-1">
+                <div class="bg-white rounded-[var(--radius)] shadow p-4 space-y-2">
+                    <button onclick="app.switchTab('settings')" class="w-full text-left px-4 py-2 rounded hover:bg-blue-50 hover:text-[var(--primary)] font-medium transition tab-btn bg-blue-50 text-[var(--primary)]" data-tab="settings">
+                        <i class="fa-solid fa-sliders mr-2"></i> Cấu hình Website
+                    </button>
+                    <button onclick="app.switchTab('leads')" class="w-full text-left px-4 py-2 rounded hover:bg-blue-50 hover:text-[var(--primary)] font-medium transition tab-btn" data-tab="leads">
+                        <i class="fa-solid fa-users mr-2"></i> Danh sách Lead
+                    </button>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="col-span-1 md:col-span-3">
+                
+                <!-- Settings Tab -->
+                <div id="tab-settings" class="tab-content bg-white rounded-[var(--radius)] shadow p-6">
+                    <h3 class="text-lg font-bold mb-6 border-b pb-2">Cấu hình hiển thị</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Màu chủ đạo (Primary)</label>
+                                <input type="color" id="conf-primary" class="mt-1 h-10 w-full rounded border cursor-pointer">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Bo góc (Radius)</label>
+                                <select id="conf-radius" class="mt-1 block w-full border border-gray-300 rounded p-2">
+                                    <option value="0px">Vuông (0px)</option>
+                                    <option value="4px">Nhỏ (4px)</option>
+                                    <option value="6px">Vừa (6px)</option>
+                                    <option value="12px">Lớn (12px)</option>
+                                    <option value="24px">Tròn (24px)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tên thương hiệu</label>
+                            <input type="text" id="conf-brandName" class="mt-1 block w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tiêu đề Hero</label>
+                            <input type="text" id="conf-heroTitle" class="mt-1 block w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Phụ đề Hero</label>
+                            <input type="text" id="conf-heroSubtitle" class="mt-1 block w-full border border-gray-300 rounded p-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Mô tả Hero</label>
+                            <textarea id="conf-heroDesc" rows="2" class="mt-1 block w-full border border-gray-300 rounded p-2"></textarea>
+                        </div>
+                        <div class="pt-4 border-t">
+                            <h4 class="font-medium mb-3">Thông tin liên hệ</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="conf-phone" placeholder="Số điện thoại" class="border p-2 rounded">
+                                <input type="text" id="conf-email" placeholder="Email" class="border p-2 rounded">
+                                <input type="text" id="conf-address" placeholder="Địa chỉ" class="border p-2 rounded">
+                            </div>
+                        </div>
+                         <div class="pt-4 border-t">
+                            <h4 class="font-medium mb-3">Mạng xã hội (URL)</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <input type="text" id="conf-fb" placeholder="Facebook" class="border p-2 rounded">
+                                <input type="text" id="conf-yt" placeholder="Youtube" class="border p-2 rounded">
+                                <input type="text" id="conf-tt" placeholder="TikTok" class="border p-2 rounded">
+                                <input type="text" id="conf-zalo" placeholder="Zalo Link" class="border p-2 rounded">
+                            </div>
+                        </div>
+                        <div class="pt-4">
+                            <button onclick="app.saveConfig()" class="bg-[var(--primary)] text-white px-6 py-2 rounded shadow hover:opacity-90 transition">Lưu cấu hình</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Leads Tab -->
+                <div id="tab-leads" class="tab-content hidden bg-white rounded-[var(--radius)] shadow overflow-hidden">
+                    <div class="p-6 border-b flex justify-between items-center">
+                        <h3 class="text-lg font-bold">Khách hàng tiềm năng</h3>
+                        <button onclick="app.exportLeads()" class="text-sm text-blue-600 hover:underline">Xuất CSV</button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SĐT</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tin nhắn</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Rendered via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <script src="v.js"></script>
+</body>
+</html>
