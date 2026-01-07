@@ -3,143 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - DMP AI Dev</title>
+    <title>DMP AI Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #1677ff;
-            --radius: 6px;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6366f1',
+                        surface: '#f3f4f6'
+                    }
+                }
+            }
         }
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 min-h-screen">
+    </script>
+<style>:root {
+  --primary: #2563eb;
+  --radius: 0.75rem;
+}</style></head>
+<body class="bg-surface text-gray-800 font-sans">
 
-    <!-- Login Overlay -->
-    <div id="loginOverlay" class="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-lg shadow-2xl w-96 text-center">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800">DMP Admin Login</h2>
-            <input type="password" id="adminPass" placeholder="Mật khẩu quản trị" class="w-full p-3 border border-gray-300 rounded mb-4 focus:ring-2 focus:ring-blue-500 outline-none">
-            <button onclick="app.adminLogin()" class="w-full bg-[var(--primary)] text-white py-3 rounded hover:bg-blue-600 transition">Đăng nhập</button>
-            <p id="loginMsg" class="text-red-500 text-sm mt-3 hidden">Mật khẩu không đúng!</p>
+    <!-- Login Modal -->
+    <div id="login-modal" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md">
+            <h2 class="text-2xl font-bold mb-6 text-center text-primary">Admin Login</h2>
+            <form id="login-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Mật khẩu</label>
+                    <input type="password" id="password" class="w-full border rounded-lg px-4 py-2 mt-1 focus:ring-2 focus:ring-primary focus:outline-none" placeholder="Nhập mật khẩu...">
+                    <p id="login-error" class="text-red-500 text-sm mt-2 hidden">Mật khẩu không đúng!</p>
+                </div>
+                <button type="submit" class="w-full bg-primary text-white py-2 rounded-lg font-bold hover:bg-primary/90 transition">Đăng nhập</button>
+            </form>
         </div>
     </div>
 
-    <!-- Main Admin Content -->
-    <div id="adminContent" class="hidden">
-        <nav class="bg-white shadow-sm border-b">
-            <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-                <div class="font-bold text-xl text-[var(--primary)]">DMP CMS</div>
-                <button onclick="app.logout()" class="text-gray-500 hover:text-red-500 text-sm"><i class="fa-solid fa-sign-out-alt"></i> Đăng xuất</button>
+    <!-- Dashboard Interface -->
+    <div id="dashboard" class="hidden min-h-screen flex">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r shadow-sm fixed h-full overflow-y-auto">
+            <div class="p-6 border-b">
+                <h1 class="text-xl font-bold text-primary">DMP Admin</h1>
             </div>
-        </nav>
+            <nav class="p-4 space-y-2">
+                <button onclick="showTab('content')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-surface text-gray-600 font-medium flex items-center gap-3 tab-btn bg-surface text-primary" data-tab="content">
+                    <i class="fas fa-edit"></i> Quản lý Nội dung
+                </button>
+                <button onclick="showTab('leads')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-surface text-gray-600 font-medium flex items-center gap-3 tab-btn" data-tab="leads">
+                    <i class="fas fa-envelope"></i> Danh sách Lead
+                </button>
+                <button onclick="showTab('media')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-surface text-gray-600 font-medium flex items-center gap-3 tab-btn" data-tab="media">
+                    <i class="fas fa-images"></i> Kho ảnh
+                </button>
+                <button onclick="logout()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-red-50 text-red-500 font-medium flex items-center gap-3 mt-8">
+                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
+                </button>
+            </nav>
+        </aside>
 
-        <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Sidebar -->
-            <div class="col-span-1">
-                <div class="bg-white rounded-[var(--radius)] shadow p-4 space-y-2">
-                    <button onclick="app.switchTab('settings')" class="w-full text-left px-4 py-2 rounded hover:bg-blue-50 hover:text-[var(--primary)] font-medium transition tab-btn bg-blue-50 text-[var(--primary)]" data-tab="settings">
-                        <i class="fa-solid fa-sliders mr-2"></i> Cấu hình Website
-                    </button>
-                    <button onclick="app.switchTab('leads')" class="w-full text-left px-4 py-2 rounded hover:bg-blue-50 hover:text-[var(--primary)] font-medium transition tab-btn" data-tab="leads">
-                        <i class="fa-solid fa-users mr-2"></i> Danh sách Lead
+        <!-- Main Content -->
+        <main class="ml-64 flex-1 p-8">
+            <!-- Content Editor Tab -->
+            <div id="tab-content" class="space-y-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Chỉnh sửa Website</h2>
+                    <button onclick="saveConfig()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold shadow-lg transition">
+                        <i class="fas fa-save mr-2"></i> Lưu thay đổi
                     </button>
                 </div>
-            </div>
-
-            <!-- Content Area -->
-            <div class="col-span-1 md:col-span-3">
                 
-                <!-- Settings Tab -->
-                <div id="tab-settings" class="tab-content bg-white rounded-[var(--radius)] shadow p-6">
-                    <h3 class="text-lg font-bold mb-6 border-b pb-2">Cấu hình hiển thị</h3>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Màu chủ đạo (Primary)</label>
-                                <input type="color" id="conf-primary" class="mt-1 h-10 w-full rounded border cursor-pointer">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">Bo góc (Radius)</label>
-                                <select id="conf-radius" class="mt-1 block w-full border border-gray-300 rounded p-2">
-                                    <option value="0px">Vuông (0px)</option>
-                                    <option value="4px">Nhỏ (4px)</option>
-                                    <option value="6px">Vừa (6px)</option>
-                                    <option value="12px">Lớn (12px)</option>
-                                    <option value="24px">Tròn (24px)</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Tên thương hiệu</label>
-                            <input type="text" id="conf-brandName" class="mt-1 block w-full border border-gray-300 rounded p-2">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Tiêu đề Hero</label>
-                            <input type="text" id="conf-heroTitle" class="mt-1 block w-full border border-gray-300 rounded p-2">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Phụ đề Hero</label>
-                            <input type="text" id="conf-heroSubtitle" class="mt-1 block w-full border border-gray-300 rounded p-2">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Mô tả Hero</label>
-                            <textarea id="conf-heroDesc" rows="2" class="mt-1 block w-full border border-gray-300 rounded p-2"></textarea>
-                        </div>
-                        <div class="pt-4 border-t">
-                            <h4 class="font-medium mb-3">Thông tin liên hệ</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="text" id="conf-phone" placeholder="Số điện thoại" class="border p-2 rounded">
-                                <input type="text" id="conf-email" placeholder="Email" class="border p-2 rounded">
-                                <input type="text" id="conf-address" placeholder="Địa chỉ" class="border p-2 rounded">
-                            </div>
-                        </div>
-                         <div class="pt-4 border-t">
-                            <h4 class="font-medium mb-3">Mạng xã hội (URL)</h4>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <input type="text" id="conf-fb" placeholder="Facebook" class="border p-2 rounded">
-                                <input type="text" id="conf-yt" placeholder="Youtube" class="border p-2 rounded">
-                                <input type="text" id="conf-tt" placeholder="TikTok" class="border p-2 rounded">
-                                <input type="text" id="conf-zalo" placeholder="Zalo Link" class="border p-2 rounded">
-                            </div>
-                        </div>
-                        <div class="pt-4">
-                            <button onclick="app.saveConfig()" class="bg-[var(--primary)] text-white px-6 py-2 rounded shadow hover:opacity-90 transition">Lưu cấu hình</button>
-                        </div>
-                    </div>
+                <div class="bg-white rounded-xl shadow-sm border p-6">
+                   <div class="flex space-x-4 mb-6 overflow-x-auto pb-2 border-b">
+                       <button onclick="filterSection('hero')" class="px-4 py-2 rounded-full bg-primary text-white text-sm">Hero</button>
+                       <button onclick="filterSection('about')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">About</button>
+                       <button onclick="filterSection('services')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Services</button>
+                       <button onclick="filterSection('products')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Products</button>
+                       <button onclick="filterSection('pricing')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Pricing</button>
+                       <button onclick="filterSection('team')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Team</button>
+                       <button onclick="filterSection('testimonials')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Testimonials</button>
+                       <button onclick="filterSection('faq')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">FAQ</button>
+                       <button onclick="filterSection('blog')" class="px-4 py-2 rounded-full bg-gray-100 hover:bg-gray-200 text-sm">Blog</button>
+                   </div>
+                   
+                   <div id="editor-container" class="space-y-6">
+                       <!-- Form inputs generated by JS -->
+                   </div>
                 </div>
-
-                <!-- Leads Tab -->
-                <div id="tab-leads" class="tab-content hidden bg-white rounded-[var(--radius)] shadow overflow-hidden">
-                    <div class="p-6 border-b flex justify-between items-center">
-                        <h3 class="text-lg font-bold">Khách hàng tiềm năng</h3>
-                        <button onclick="app.exportLeads()" class="text-sm text-blue-600 hover:underline">Xuất CSV</button>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ngày</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SĐT</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tin nhắn</th>
-                                </tr>
-                            </thead>
-                            <tbody id="leadsTableBody" class="bg-white divide-y divide-gray-200">
-                                <!-- Rendered via JS -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
             </div>
-        </div>
+
+            <!-- Leads Tab -->
+            <div id="tab-leads" class="hidden">
+                <h2 class="text-2xl font-bold mb-6">Danh sách khách hàng tiềm năng</h2>
+                <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="p-4 font-semibold text-gray-600">Ngày</th>
+                                <th class="p-4 font-semibold text-gray-600">Tên</th>
+                                <th class="p-4 font-semibold text-gray-600">Email</th>
+                                <th class="p-4 font-semibold text-gray-600">Tin nhắn</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-table-body">
+                            <!-- Leads Data -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Media Tab -->
+             <div id="tab-media" class="hidden">
+                 <h2 class="text-2xl font-bold mb-6">Kho Hình Ảnh (URLs)</h2>
+                 <div class="bg-white p-6 rounded-xl shadow-sm border mb-6">
+                     <p class="text-gray-500 mb-4">Copy các link ảnh từ Unsplash hoặc host khác để dùng trong phần Content.</p>
+                     <div class="grid grid-cols-2 gap-4 text-sm">
+                         <div class="p-2 border rounded bg-gray-50">Tech 1: https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=800</div>
+                         <div class="p-2 border rounded bg-gray-50">Tech 2: https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800</div>
+                         <div class="p-2 border rounded bg-gray-50">Code: https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800</div>
+                         <div class="p-2 border rounded bg-gray-50">Team: https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800</div>
+                     </div>
+                 </div>
+             </div>
+        </main>
     </div>
-    <script src="v.js"></script>
+
+    <script src="js/admin.js"></script>
 </body>
 </html>
